@@ -1,0 +1,128 @@
+Enum role_name{
+  nemo_admin
+  yatch_admin
+  system_admin
+  chief_stewardess
+  stewardess
+  chef
+  captain
+  deck_hand
+  guest
+}
+
+Enum room_type {
+  standard
+  deluxe
+  suite
+}
+
+Table users {
+  id uuid [pk]
+  first_name string [not null]
+  last_name string
+  email string [not null, unique]
+  password string [not null]
+  role role_name [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+}
+
+Table yatchs {
+  id uuid [pk]
+  name string [not null]
+  created_at timestamp [default: `now()`]
+  created_by uuid [ref: > users.id]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table yatch_config {
+  id uuid [pk]
+  yatch_id uuid [not null,ref: > yatchs.id]
+  ip_address string [not null]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table decks {
+  id uuid [pk]
+  name string [not null]
+  yatch_id uuid [not null,ref: > yatchs.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table rooms {
+  id uuid [pk]
+  name string [not null]
+  room_type room_type
+  deck_id uuid [not null,ref: > decks.id]
+  is_occupied bool [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table guests {
+  id uuid [pk]
+  name string [not null]
+  email string [unique]
+  mobile_number number 
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table guest_room {
+  id uuid [pk]
+  room_id uuid [not null,ref: > rooms.id]
+  guest_id uuid [not null,ref : > guests.id]
+  check_in datetime [not null]
+  check_out datetime
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table guest_relation {
+  id uuid [pk]
+  guest uuid [not null,ref: > guests.id]
+  relation_with uuid [not null,ref: > guests.id]
+  relationship string [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table menu_items {
+  id uuid [pk]
+  name string [not null]
+  category uuid [not null,ref: > categories.id]
+  yatch_id uuid [not null,ref: > yatchs.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table menu_ingredients {
+  id uuid [pk]
+  menu_item_id uuid [not null,ref: > menu_items.id]
+  ingredient_id uuid [not null,ref: > ingredients.id]
+}
+
+Table categories {
+  id uuid [pk]
+  name string [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table ingredients {
+  id uuid [pk]
+  name string [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+}
